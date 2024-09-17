@@ -1,0 +1,69 @@
+-- Show the contents of all tables
+
+SELECT * FROM Customer;
+SELECT * FROM Format;
+SELECT * FROM Fee;
+SELECT * FROM Genre;
+SELECT * FROM Movie;
+SELECT * FROM Media;
+SELECT * FROM Rental;
+SELECT * FROM Rental_Fee;
+SELECT * FROM Distributor;
+SELECT * FROM Movie_Distributor;
+SELECT * FROM Director;
+SELECT * FROM Movie_Director;
+SELECT * FROM Actor;
+SELECT * FROM Movie_Actor;
+SELECT * FROM Actress;
+SELECT * FROM Movie_Actress;
+SELECT * FROM Award;
+SELECT * FROM Director_Award;
+SELECT * FROM Movie_Award;
+SELECT * FROM Actor_Award;
+SELECT * FROM Actress_Award;
+
+-- Retrieve all of the customers' names, account numbers, and addresses (street and zip code only), sorted by account number
+
+SELECT 
+  CustomerID, CustomerLastName, CustomerFirstName, CustomberStreetAddress, CustomerZip 
+FROM 
+  Customer
+ORDER BY 
+  CustomerID;
+
+-- Retrieve all of the DVDs rented in the last 30 days and sort in chronological rental data order
+
+SELECT
+  DateRented, Title, FormatType 
+FROM
+  Media
+INNER JOIN
+  Format ON Format.FormatID = Media.FormatID
+INNER JOIN
+	Rental ON Rental.MediaID = Media.MediaID
+INNER JOIN
+	Movie ON Movie.OwnerMovieID = Media.OwnerMovieID
+WHERE 
+  FormatType = ‘DVD’ AND 
+  DateRented BETWEEN ‘2019-06-07’ AND ‘2019-07-07’
+ORDER BY
+  DateRented;
+
+-- Update a customer name to change their maiden name to their married name
+
+UPDATE
+	Customer
+SET
+	CustomerLastName = ‘Langston’
+WHERE
+	CustomerID = 3;
+
+-- Delete a specific customer from the database
+
+DELETE 
+FROM
+	Customer
+WHERE
+	CustomerID = 1;
+
+
