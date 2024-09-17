@@ -1,0 +1,389 @@
+CREATE TABLE Customer (
+	CustomerID INTEGER NOT NULL,
+	CustomerLastName VARCHAR(30) NOT NULL,
+	CustomerFirstName VARCHAR(30) NOT NULL,
+	CustomerStreetAddress VARCHAR(30) NOT NULL,
+	CustomerCity VARCHAR(30) NOT NULL,
+	CustomerState CHAR(2) NOT NULL,
+	CustomerZip CHAR(10) NOT NULL,
+	CustomerPhone CHAR(13) NOT NULL,
+	CustomerEmail VARCHAR(100) NOT NULL UNIQUE,
+CONSTRAINT PKCustomer PRIMARY KEY (CustomerID)
+);
+
+CREATE TABLE Format (
+	FormatID SMALLINT NOT NULL,
+	FormatType VARCHAR(15) NOT NULL UNIQUE,
+CONSTRAINT PKFormat PRIMARY KEY (FormatID)
+);
+
+CREATE TABLE Fee (
+	FeeID SMALLINT NOT NULL,
+	FeeName VARCHAR(40) NOT NULL UNIQUE,
+	FeeCost DECIMAL(3, 2) NOT NULL,
+	FormatID SMALLINT NOT NULL,
+CONSTRAINT PKFee PRIMARY KEY (FeeID),
+CONSTRAINT FKFee FOREIGN KEY (FormatID) REFERENCES Format
+);
+
+CREATE TABLE Genre (
+	GenreID SMALLINT NOT NULL,
+	Genre VARCHAR(15) NOT NULL UNIQUE,
+CONSTRAINT PKGenre PRIMARY KEY (GenreID)
+);
+
+CREATE TABLE Movie (
+	OwnerMovieID INTEGER NOT NULL,
+	Title VARCHAR(100) NOT NULL,
+	GenreID SMALLINT NOT NULL,
+	YearReleased CHAR(4) NOT NULL,
+	RunTimeMinutes CHAR(3) NOT NULL,
+	Rating DECIMAL(3,1),
+UNIQUE (Title, YearReleased),
+CONSTRAINT PKMovie PRIMARY KEY (OwnerMovieID),
+CONSTRAINT FKMovie FOREIGN KEY (GenreID) REFERENCES Genre
+);
+
+CREATE TABLE Media (
+	MediaID BIGINT NOT NULL,
+	DistributorSerialNumber INTEGER NOT NULL UNIQUE,
+	OwnerMovieID INTEGER NOT NULL,
+	FormatID SMALLINT NOT NULL,
+CONSTRAINT PKMedia PRIMARY KEY (MediaID),
+CONSTRAINT FKMedia_Movie FOREIGN KEY (OwnerMovieID) REFERENCES Movie,
+CONSTRAINT FKMedia_Format FOREIGN KEY (FormatID) REFERENCES Format
+);
+
+CREATE TABLE Rental (
+	RentalID INTEGER NOT NULL,
+	MediaID BIGINT NOT NULL,
+	CustomerID INTEGER NOT NULL,
+	DateRented DATE NOT NULL,
+	ReturnDueDate DATE NOT NULL,
+	DateReturned DATE,
+CONSTRAINT PKRental PRIMARY KEY (RentalID),
+CONSTRAINT FKRental_Media FOREIGN KEY (MediaID) REFERENCES Media,
+CONSTRAINT FKRental_Customer FOREIGN KEY (CustomerID) REFERENCES Customer
+);
+
+CREATE TABLE Rental_Fee (
+	RentalID INTEGER NOT NULL,
+	FeeID SMALLINT NOT NULL,
+CONSTRAINT PKRental_Fee PRIMARY KEY (RentalID, FeeID),
+CONSTRAINT FKRental_Fee_Rental FOREIGN KEY (RentalID) REFERENCES Rental,
+CONSTRAINT FKRental_Fee_Fee FOREIGN KEY (FeeID) REFERENCES Fee
+);
+
+CREATE TABLE Distributor (
+	DistributorID INTEGER NOT NULL,
+	DistributorName VARCHAR(50) NOT NULL UNIQUE,
+CONSTRAINT PKDistributor PRIMARY KEY (DistributorID)
+);
+
+CREATE TABLE Movie_Distributor (
+	OwnerMovieID INTEGER NOT NULL,
+	DistributorID INTEGER NOT NULL,
+	DistributorMovieID INTEGER NOT NULL UNIQUE,
+CONSTRAINT PKMovie_Distributor PRIMARY KEY (OwnerMovieID, DistributorID),
+CONSTRAINT FKMovie_Distributor_Movie FOREIGN KEY (OwnerMovieID) REFERENCES Movie,
+CONSTRAINT FKMovie_Distributor_Distributor FOREIGN KEY (DistributorID) REFERENCES Distributor
+);
+
+CREATE TABLE Director (
+	DirectorID INTEGER NOT NULL,
+	DirectorLastName VARCHAR(30)  NOT NULL,
+	DirectorFirstName VARCHAR(30) NOT NULL,
+CONSTRAINT PKDirector PRIMARY KEY (DirectorID)
+);
+
+CREATE TABLE Movie_Director (
+	OwnerMovieID INTEGER NOT NULL,
+	DirectorID INTEGER NOT NULL,
+CONSTRAINT PKMovie_Director PRIMARY KEY (OwnerMovieID, DirectorID),
+CONSTRAINT FKMovie_Director_Movie FOREIGN KEY (OwnerMovieID) REFERENCES Movie,
+CONSTRAINT FKMovie_Director_Director FOREIGN KEY (DirectorID) REFERENCES Director
+);
+
+CREATE TABLE Actor (
+	ActorID INTEGER NOT NULL,
+	ActorLastName VARCHAR(30),
+	ActorFirstName VARCHAR(30),
+CONSTRAINT PKActor PRIMARY KEY (ActorID)
+);
+
+CREATE TABLE Movie_Actor (
+	OwnerMovieID INTEGER NOT NULL,
+	ActorID INTEGER NOT NULL,
+CONSTRAINT PKMovie_Actor PRIMARY KEY (OwnerMovieID, ActorID),
+CONSTRAINT FKMovie_Actor_Movie FOREIGN KEY (OwnerMovieID) REFERENCES Movie,
+CONSTRAINT FKMovie_Actor_Actor FOREIGN KEY (ActorID) REFERENCES Actor
+);
+
+CREATE TABLE Actress (
+ActressID INTEGER NOT NULL,
+	ActressLastName VARCHAR(30),
+	ActressFirstName VARCHAR(30),
+CONSTRAINT PKActress PRIMARY KEY (ActressID)
+); 
+
+CREATE TABLE Movie_Actress (
+	OwnerMovieID INTEGER NOT NULL,
+	ActressID INTEGER NOT NULL,
+CONSTRAINT PKMovie_Actress PRIMARY KEY (OwnerMovieID, ActressID),
+CONSTRAINT FKMovie_Actress_Movie FOREIGN KEY (OwnerMovieID) REFERENCES Movie,
+CONSTRAINT FKMovie_Actress_Actress FOREIGN KEY (ActressID) REFERENCES Actress
+);
+
+CREATE TABLE Award (
+	AwardID INTEGER NOT NULL,
+	AwardName VARCHAR(30) NOT NULL UNIQUE,
+CONSTRAINT PKAward PRIMARY KEY (AwardID)
+);
+
+CREATE TABLE Movie_Award (
+	OwnerMovieID INTEGER NOT NULL,
+	AwardID INTEGER NOT NULL,
+CONSTRAINT PKMovie_Award PRIMARY KEY (OwnerMovieID, AwardID),
+CONSTRAINT FKMovie_Award_Movie FOREIGN KEY (OwnerMovieID) REFERENCES Movie,
+CONSTRAINT FKMovie_Award_Award FOREIGN KEY (AwardID) REFERENCES Award
+);
+
+CREATE TABLE Director_Award (
+	DirectorID INTEGER NOT NULL,
+	AwardID INTEGER NOT NULL,
+CONSTRAINT PKDirector_Award PRIMARY KEY (DirectorID, AwardID),
+CONSTRAINT FKDirector_Award_Director FOREIGN KEY (DirectorID) REFERENCES Director,
+CONSTRAINT FKDirector_Award_Award FOREIGN KEY (AwardID) REFERENCES Award
+);
+
+CREATE TABLE Actor_Award (
+	ActorID INTEGER NOT NULL,
+	AwardID INTEGER NOT NULL,
+CONSTRAINT PKActor_Award PRIMARY KEY (ActorID, AwardID),
+CONSTRAINT FKActor_Award_Actor FOREIGN KEY (ActorID) REFERENCES Actor,
+CONSTRAINT FKActor_Award_Award FOREIGN KEY (AwardID) REFERENCES Award
+);
+
+CREATE TABLE Actress_Award (
+	ActressID INTEGER NOT NULL,
+	AwardID INTEGER NOT NULL,
+CONSTRAINT PKActress_Award PRIMARY KEY (ActressID, AwardID),
+CONSTRAINT FKActress_Award_Actress FOREIGN KEY (ActressID) REFERENCES Actress,
+CONSTRAINT FKActress_Award_Award FOREIGN KEY (AwardID) REFERENCES Award
+);
+
+INSERT INTO Customer VALUES (1, ‘Smith’, ‘Bob’, ‘111 Euclid Street’, ‘Los Angeles’, ‘CA’, ‘90210-1111’, ‘(310)111-1111’, ‘bob.smith@bobsmith.com’);
+INSERT INTO Customer VALUES (2, ‘Black’, ‘John’, ’22 Richardson Drive’, ‘Los Angeles’, ‘CA’, ‘90210-2222’, ‘(310)222-2222’, ‘john.black@johnblack.com’);
+INSERT INTO Customer VALUES (3, ‘Marcus’, ‘Wendy’, ‘3 S. 14th Street’, ‘Los Angeles’, ‘CA’, ‘90210-3333’, ‘(424)333-333’, ‘wendy@marcus.com’);
+INSERT INTO Customer VALUES (4, ‘Morris’, ‘Stacy’, ‘444 Broad Street’, ‘Los Angeles’, ‘CA’, ‘90212-4444’, ‘(818)444-4444’, ‘stacy.morris@stacymorris.com’);
+INSERT INTO Customer VALUES (5, ‘Harris’, ‘Alex’, ‘5 Brewery Drive’, ‘Los Angeles’, ‘CA’, ‘90212-5555’, ‘(818)555-5555’, ‘alex@harris.com’);
+
+INSERT INTO Format VALUES (1, ‘Video’);
+INSERT INTO Format VALUES (2, ‘DVD’); 
+INSERT INTO Format VALUES (3, ‘Blu-Ray’);
+INSERT INTO Format VALUES (4, ‘Digital’);
+INSERT INTO Format VALUES (5, ‘HD’);
+
+INSERT INTO Fee VALUES (1, ‘Rental Fee for Video’, 3.99, 1);
+INSERT INTO Fee VALUES (2, ‘Rental Fee for DVD’, 5.99, 2);
+INSERT INTO Fee VALUES (3, ‘Late Fee for Video’, 2.00, 1);
+INSERT INTO Fee VALUES (4, ‘Late Fee for DVD’, 3.00, 2);
+INSERT INTO Fee VALUES (5, ‘Damage Fee for Video’, 1.00, 1);
+INSERT INTO Fee VALUES (6, ‘Damage Fee for DVD’, 3.00, 2);
+INSERT INTO Fee VALUES (7, ‘Failure to Rewind Fee for Video’, 1.00, 1);
+INSERT INTO Fee VALUES (8, ‘Tax for Video’, 0.50, 1);
+INSERT INTO Fee VALUES (9, ‘Tax for DVD’, 0.75, 2);
+
+INSERT INTO Genre VALUES (1, ‘Action’);
+INSERT INTO Genre VALUES (2, ‘Romance’);
+INSERT INTO Genre VALUES (3, ‘Comedy’);
+INSERT INTO Genre VALUES (4, ‘Horror’);
+INSERT INTO Genre VALUES (5, ‘Thriller’);
+INSERT INTO Genre VALUES (6, ‘Drama’);
+
+INSERT INTO Movie VALUES (1, ‘Titanic’, 2, ‘1997’, ‘194’, 7.8);
+INSERT INTO Movie VALUES (2, ‘Star Wars: A New Hope’, 1, ‘1977’, ‘121’, 8.6);
+INSERT INTO Movie VALUES (3, ‘Back to the Future’, 3, ‘1985’, ‘116’, 8.5);
+INSERT INTO Movie VALUES (4, ‘The Avengers’, 1, ‘2012’, ‘143’, 8.1);
+INSERT INTO Movie VALUES (5, ‘Forrest Gump’, 3, ‘1994’, ‘142’, 8.8);
+INSERT INTO Movie VALUES (6, ‘The Silence of the Lambs’, 4, ‘1991’, ‘118’, 8.6);
+INSERT INTO Movie VALUES (7, ‘The Hurt Locker’, 6, ‘2008’, ‘131’, 7.6);
+
+INSERT INTO Media VALUES (1, 1, 1, 1);
+INSERT INTO Media VALUES (2, 2, 1, 2);
+INSERT INTO Media VALUES (3, 3, 2, 1);
+INSERT INTO Media VALUES (4, 4, 2, 2);
+INSERT INTO Media VALUES (5, 5, 3, 1);
+INSERT INTO Media VALUES (6, 6, 3, 2);
+INSERT INTO Media VALUES (7, 7, 4, 1);
+INSERT INTO Media VALUES (8, 8, 4, 2);
+INSERT INTO Media VALUES (9, 9, 5, 1);
+INSERT INTO Media VALUES (10, 10, 5, 2);
+INSERT INTO Media VALUES (11, 11, 6, 1);
+INSERT INTO Media VALUES (12, 12, 6, 2);
+INSERT INTO Media VALUES (13, 13, 7, 1);
+INSERT INTO Media VALUES (14, 14, 7, 2);
+
+INSERT INTO Rental VALUES (1, 2, 1, ‘2019-07-04’, ‘2019-07-11’, NULL);
+INSERT INTO Rental VALUES (2, 5, 1, ‘2019-01-01’, ‘2019-01-08’, ‘2019-01-07’);
+INSERT INTO Rental VALUES (3, 4, 2, ‘2019-06-20’, ‘2019-06-27’, ‘2019-07-01’);
+INSERT INTO Rental VALUES (4, 8, 2, ‘2019-02-01’, ‘2019-02-08’, NULL);
+INSERT INTO Rental VALUES (5, 14, 5, ‘2019-05-15’, ‘2019-05-22’, ‘2019-05-16’);
+
+INSERT INTO Rental-Fee VALUES (1, 2);
+INSERT INTO Rental-Fee VALUES (2, 1);
+INSERT INTO Rental-Fee VALUES (3, 2);
+INSERT INTO Rental-Fee VALUES (3, 4);
+INSERT INTO Rental-Fee VALUES (4, 2);
+INSERT INTO Rental-Fee VALUES (5, 2);
+
+INSERT INTO Distributor VALUES (1, ‘Paramount Pictures’);
+INSERT INTO Distributor VALUES (2, ‘20th Century Fox’);
+INSERT INTO Distributor VALUES (3, ‘Universal Pictures’);
+INSERT INTO Distributor VALUES (4, ‘Walt Disney Studios Motion Pictures’);
+INSERT INTO Distributor VALUES (5, ‘Orion Pictures’);
+INSERT INTO Distributor VALUES (6, ‘Summit Entertainment’);
+
+INSERT INTO Movie-Distributor VALUES (1, 1, 1);
+INSERT INTO Movie-Distributor VALUES (1, 2, 2);
+INSERT INTO Movie-Distributor VALUES (2, 2, 3);
+INSERT INTO Movie-Distributor VALUES (3, 3, 4);
+INSERT INTO Movie-Distributor VALUES (4, 4, 5);
+INSERT INTO Movie-Distributor VALUES (5, 1, 6);
+INSERT INTO Movie-Distributor VALUES (6, 5, 7);
+INSERT INTO Movie-Distributor VALUES (7, 6, 8);
+
+INSERT INTO Director VALUES (1, ‘Cameron’, ‘James’);
+INSERT INTO Director VALUES (2, ‘Lucas’, ‘George’);
+INSERT INTO Director VALUES (3, ‘Zemeckis’, ‘Robert’);
+INSERT INTO Director VALUES (4, ‘Whedon’, ‘Joss’);
+INSERT INTO Director VALUES (5, ‘Demme’, ‘Jonathan’);
+INSERT INTO Director VALUES (6, ‘Jackson’, ‘Peter’);
+INSERT INTO Director VALUES (7, ‘Bigelow’, ‘Kathryn’);
+INSERT INTO Director VALUES (8, ‘del Toro’, ‘Guillermo’);
+INSERT INTO Director VALUES (9, ‘Howard’, ‘Ron’);
+
+INSERT INTO Movie-Director VALUES (1, 1);
+INSERT INTO Movie-Director VALUES (2, 2);
+INSERT INTO Movie-Director VALUES (3, 3);
+INSERT INTO Movie-Director VALUES (4, 4);
+INSERT INTO Movie-Director VALUES (5, 3);
+INSERT INTO Movie-Director VALUES (6, 5);
+INSERT INTO Movie-Director VALUES (7, 7);
+
+INSERT INTO Actor VALUES (1, ‘DiCaprio’, ‘Leonardo’);
+INSERT INTO Actor VALUES (2, ‘Hamill’, ‘Mark’);
+INSERT INTO Actor VALUES (3, ‘Ford’, ‘Harrison’);
+INSERT INTO Actor VALUES (4, ‘Cushing’, ‘Peter’);
+INSERT INTO Actor VALUES (5, ‘Guinness’, ‘Alec’);
+INSERT INTO Actor VALUES (6, ‘Fox’, ‘Michael J.’);
+INSERT INTO Actor VALUES (7, ‘Lloyd’, ‘Christopher’);
+INSERT INTO Actor VALUES (8, ‘Glover’, ‘Crispin’);
+INSERT INTO Actor VALUES (9, ‘Downey Jr.’, ‘Robert’);
+INSERT INTO Actor VALUES (10, ‘Evans’, ‘Chris’);
+INSERT INTO Actor VALUES (11, ‘Ruffalo’, ‘Mark’);
+INSERT INTO Actor VALUES (12, ‘Hemsworth’, ‘Chris’);
+INSERT INTO Actor VALUES (13, ‘Renner’, ‘Jeremy’);
+INSERT INTO Actor VALUES (14, ‘Hiddleston’, ‘Tom’);
+INSERT INTO Actor VALUES (15, ‘Gregg’, ‘Clark’);
+INSERT INTO Actor VALUES (16, ‘Skarsgard’, ‘Stellan’);
+INSERT INTO Actor VALUES (17, ‘Jackson’, ‘Samuel L.’);
+INSERT INTO Actor VALUES (18, ‘Hanks’, ‘Tom’);
+INSERT INTO Actor VALUES (19, ‘Sinise’, ‘Gary’); 
+INSERT INTO Actor VALUES (20, ‘Williamsson’, ‘Mykelti’);
+INSERT INTO Actor VALUES (21, ‘Hopkins’, ‘Anthony’); 
+INSERT INTO Actor VALUES (22, ‘Glenn’, ‘Scott’); 
+INSERT INTO Actor VALUES (23, ‘Levine’, ‘Ted’);
+INSERT INTO Actor VALUES (24, ‘Nicholson’, ‘Jack’);
+
+INSERT INTO Movie-Actor VALUES (1, 1);
+INSERT INTO Movie-Actor VALUES (2, 2);
+INSERT INTO Movie-Actor VALUES (2, 3);
+INSERT INTO Movie-Actor VALUES (2, 4);
+INSERT INTO Movie-Actor VALUES (2, 5);
+INSERT INTO Movie-Actor VALUES (3, 6);
+INSERT INTO Movie-Actor VALUES (3, 7);
+INSERT INTO Movie-Actor VALUES (3, 8);
+INSERT INTO Movie-Actor VALUES (4, 9);
+INSERT INTO Movie-Actor VALUES (4, 10);
+INSERT INTO Movie-Actor VALUES (4, 11);
+INSERT INTO Movie-Actor VALUES (4, 12);
+INSERT INTO Movie-Actor VALUES (4, 13);
+INSERT INTO Movie-Actor VALUES (4, 14);
+INSERT INTO Movie-Actor VALUES (4, 15);
+INSERT INTO Movie-Actor VALUES (4, 16);
+INSERT INTO Movie-Actor VALUES (4, 17);
+INSERT INTO Movie-Actor VALUES (5, 18);
+INSERT INTO Movie-Actor VALUES (5, 19);
+INSERT INTO Movie-Actor VALUES (5, 20);
+INSERT INTO Movie-Actor VALUES (6, 21);
+INSERT INTO Movie-Actor VALUES (6, 22);
+INSERT INTO Movie-Actor VALUES (6, 23);
+
+INSERT INTO Actress VALUES (1, ‘Winslet’, ‘Kate’);
+INSERT INTO Actress VALUES (2, ‘Fisher’, ‘Carrie’);
+INSERT INTO Actress VALUES (3, ‘Thompson’, ‘Lea’);
+INSERT INTO Actress VALUES (4, ‘Johansson’, ‘Scarlett’);
+INSERT INTO Actress VALUES (5, ‘Smulders’, ‘Cobie’);
+INSERT INTO Actress VALUES (6, ‘Wright’, ‘Robin’);
+INSERT INTO Actress VALUES (7, ‘Field’, ‘Sally’);
+INSERT INTO Actress VALUES (8, ‘Foster’, ‘Jodie’);
+INSERT INTO Actress VALUES (9, ‘Lawrence’, ‘Jennifer’);
+INSERT INTO Actress VALUES (10, ‘Streep’, ‘Meryl’);
+
+INSERT INTO Movie-Actress VALUES (1, 1);
+INSERT INTO Movie-Actress VALUES (2, 2);
+INSERT INTO Movie-Actress VALUES (3, 3);
+INSERT INTO Movie-Actress VALUES (4, 4);
+INSERT INTO Movie-Actress VALUES (4, 5);
+INSERT INTO Movie-Actress VALUES (5, 6);
+INSERT INTO Movie-Actress VALUES (5, 7);
+INSERT INTO Movie-Actress VALUES (6, 8);
+
+INSERT INTO Award VALUES (1, ‘Best Picture’);
+INSERT INTO Award VALUES (2, ‘Best Actress’);
+INSERT INTO Award VALUES (3, ‘Best Actor’);
+INSERT INTO Award VALUES (4, ‘Best Director’);
+INSERT INTO Award VALUES (5, ‘Best Supporting Actress’);
+INSERT INTO Award VALUES (6, ‘Best Supporting Actor’);
+INSERT INTO Award VALUES (7, ‘Best Original Screenplay’);
+INSERT INTO Award VALUES (8, ‘Best Original Cinematography’);
+INSERT INTO Award VALUES (9, ‘Best Costume Design’);
+INSERT INTO Award VALUES (10, ‘Best Visual Effects’);
+INSERT INTO Award VALUES (11, ‘Best Original Song’);
+
+INSERT INTO Movie_Award VALUES (1, 1);
+INSERT INTO Movie_Award VALUES (1, 4);
+INSERT INTO Movie_Award VALUES (1, 8);
+INSERT INTO Movie_Award VALUES (1, 10);
+INSERT INTO Movie_Award VALUES (1, 9);
+INSERT INTO Movie_Award VALUES (1, 11);
+INSERT INTO Movie_Award VALUES (2, 9);
+INSERT INTO Movie_Award VALUES (2, 10);
+INSERT INTO Movie_Award VALUES (5, 1);
+INSERT INTO Movie_Award VALUES (5, 4);
+INSERT INTO Movie_Award VALUES (5, 3);
+INSERT INTO Movie_Award VALUES (5, 10);
+INSERT INTO Movie_Award VALUES (6, 1);
+INSERT INTO Movie_Award VALUES (6, 2);
+INSERT INTO Movie_Award VALUES (6, 3);
+INSERT INTO Movie_Award VALUES (6, 4);
+
+INSERT INTO Director_Award VALUES (1, 4);
+INSERT INTO Director_Award VALUES (5, 4);
+INSERT INTO Director_Award VALUES (6, 4);
+INSERT INTO Director_Award VALUES (8, 4);
+INSERT INTO Director_Award VALUES (9, 4);
+
+INSERT INTO Actor_Award VALUES (5, 3);
+INSERT INTO Actor_Award VALUES (21, 3);
+INSERT INTO Actor_Award VALUES (1, 3);
+INSERT INTO Actor_Award VALUES (18, 3);
+INSERT INTO Actor_Award VALUES (24, 3);
+
+INSERT INTO Actress_Award VALUES (8, 2);
+INSERT INTO Actress_Award VALUES (1, 2);
+INSERT INTO Actress_Award VALUES (7, 2);
+INSERT INTO Actress_Award VALUES (9, 2);
+INSERT INTO Actress_Award VALUES (10, 2);
+
